@@ -130,6 +130,13 @@ class FakeController extends ValueNotifier<VideoPlayerValue>
     return true;
   }
 
+  @override
+  Future<void> setExternalAudioTracks(List<String> urls) async {
+    externalAudioUrls = urls;
+  }
+
+  List<String>? externalAudioUrls;
+
   String? selectedAudioTrackId;
 }
 
@@ -1902,6 +1909,14 @@ class FakeVideoPlayerPlatform extends VideoPlayerPlatform {
     calls.add('isAudioTrackSupportAvailable');
     return true; // Return true for testing purposes
   }
+
+  @override
+  Future<void> setExternalAudioTracks(int playerId, List<String> urls) async {
+    calls.add('setExternalAudioTracks');
+    externalAudioUrls[playerId] = urls;
+  }
+
+  final Map<int, List<String>> externalAudioUrls = <int, List<String>>{};
 
   final Map<int, String> selectedAudioTrackIds = <int, String>{};
 }
