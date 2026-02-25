@@ -192,6 +192,9 @@ abstract class VideoPlayerInstanceApi {
 
   /// Selects which audio track is chosen for playback from its [groupIndex] and [trackIndex]
   void selectAudioTrack(int groupIndex, int trackIndex);
+
+  /// Sets external audio tracks for the video.
+  void setExternalAudioTracks(List<String> urls);
 }
 
 @EventChannelApi()
