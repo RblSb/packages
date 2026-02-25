@@ -1287,6 +1287,20 @@ class VideoPlayerInstanceApi {
 
     _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
   }
+
+  /// Sets external audio tracks for the video.
+  Future<void> setExternalAudioTracks(List<String> urls) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.video_player_android.VideoPlayerInstanceApi.setExternalAudioTracks$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[urls]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
 }
 
 Stream<PlatformVideoEvent> videoEvents({String instanceName = ''}) {

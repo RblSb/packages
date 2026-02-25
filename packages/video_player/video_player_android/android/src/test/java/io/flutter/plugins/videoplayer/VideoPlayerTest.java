@@ -13,12 +13,12 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
+import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.C;
 import androidx.media3.common.Format;
-import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackParameters;
 import androidx.media3.common.Player;
 import androidx.media3.common.TrackGroup;
@@ -70,12 +70,13 @@ public final class VideoPlayerTest {
   /** A test subclass of {@link VideoPlayer} that exposes the abstract class for testing. */
   private final class TestVideoPlayer extends VideoPlayer {
     private TestVideoPlayer(
+        @NonNull Context context,
         @NonNull VideoPlayerCallbacks events,
-        @NonNull MediaItem mediaItem,
+        @NonNull VideoAsset videoAsset,
         @NonNull VideoPlayerOptions options,
         @Nullable SurfaceProducer surfaceProducer,
         @NonNull ExoPlayerProvider exoPlayerProvider) {
-      super(events, mediaItem, options, surfaceProducer, exoPlayerProvider);
+      super(context, events, videoAsset, options, surfaceProducer, exoPlayerProvider);
     }
 
     @NonNull
@@ -98,7 +99,7 @@ public final class VideoPlayerTest {
 
   private VideoPlayer createVideoPlayer(VideoPlayerOptions options) {
     return new TestVideoPlayer(
-        mockEvents, fakeVideoAsset.getMediaItem(), options, null, () -> mockExoPlayer);
+        mock(Context.class), mockEvents, fakeVideoAsset, options, null, () -> mockExoPlayer);
   }
 
   @Test

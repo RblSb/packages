@@ -52,9 +52,10 @@ public final class TextureVideoPlayer extends VideoPlayer implements SurfaceProd
       @NonNull VideoAsset asset,
       @NonNull VideoPlayerOptions options) {
     return new TextureVideoPlayer(
+        context,
         events,
         surfaceProducer,
-        asset.getMediaItem(),
+        asset,
         options,
         () -> {
           ExoPlayer.Builder builder = new ExoPlayer.Builder(context);
@@ -87,12 +88,13 @@ public final class TextureVideoPlayer extends VideoPlayer implements SurfaceProd
   @UnstableApi
   @VisibleForTesting
   public TextureVideoPlayer(
+      @NonNull Context context,
       @NonNull VideoPlayerCallbacks events,
       @NonNull SurfaceProducer surfaceProducer,
-      @NonNull MediaItem mediaItem,
+      @NonNull VideoAsset videoAsset,
       @NonNull VideoPlayerOptions options,
       @NonNull ExoPlayerProvider exoPlayerProvider) {
-    super(events, mediaItem, options, surfaceProducer, exoPlayerProvider);
+    super(context, events, videoAsset, options, surfaceProducer, exoPlayerProvider);
 
     surfaceProducer.setCallback(this);
 

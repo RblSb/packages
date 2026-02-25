@@ -1274,6 +1274,8 @@ interface VideoPlayerInstanceApi {
    * available video tracks based on network conditions.
    */
   fun enableAutoVideoQuality()
+  /** Sets external audio tracks for the video. */
+  fun setExternalAudioTracks(urls: List<String>)
 
   companion object {
     /** The codec used by VideoPlayerInstanceApi. */
@@ -1563,6 +1565,29 @@ interface VideoPlayerInstanceApi {
             val wrapped: List<Any?> =
                 try {
                   api.enableAutoVideoQuality()
+                  listOf(null)
+                } catch (exception: Throwable) {
+                  MessagesPigeonUtils.wrapError(exception)
+                }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel =
+            BasicMessageChannel<Any?>(
+                binaryMessenger,
+                "dev.flutter.pigeon.video_player_android.VideoPlayerInstanceApi.setExternalAudioTracks$separatedMessageChannelSuffix",
+                codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val urlsArg = args[0] as List<String>
+            val wrapped: List<Any?> =
+                try {
+                  api.setExternalAudioTracks(urlsArg)
                   listOf(null)
                 } catch (exception: Throwable) {
                   MessagesPigeonUtils.wrapError(exception)
