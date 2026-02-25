@@ -245,6 +245,9 @@ abstract class VideoPlayerInstanceApi {
   /// Enables automatic video quality selection, allowing the player to adaptively
   /// switch between available video tracks based on network conditions.
   void enableAutoVideoQuality();
+
+  /// Sets external audio tracks for the video.
+  void setExternalAudioTracks(List<String> urls);
 }
 
 @EventChannelApi()

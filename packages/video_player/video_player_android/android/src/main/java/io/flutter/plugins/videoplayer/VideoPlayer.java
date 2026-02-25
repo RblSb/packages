@@ -7,6 +7,7 @@ package io.flutter.plugins.videoplayer;
 import static androidx.media3.common.Player.REPEAT_MODE_ALL;
 import static androidx.media3.common.Player.REPEAT_MODE_OFF;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.NonNull;
@@ -21,6 +22,8 @@ import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.Tracks;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.source.MediaSource;
+import androidx.media3.exoplayer.source.MergingMediaSource;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 import io.flutter.view.TextureRegistry.SurfaceProducer;
 import java.util.ArrayList;
@@ -32,6 +35,8 @@ import java.util.List;
  * <p>It provides methods to control playback, adjust volume, and handle seeking.
  */
 public abstract class VideoPlayer implements VideoPlayerInstanceApi {
+  @NonNull protected final Context context;
+  @NonNull protected final VideoAsset videoAsset;
   @NonNull protected final VideoPlayerCallbacks videoPlayerEvents;
   @Nullable protected final SurfaceProducer surfaceProducer;
   @Nullable private DisposeHandler disposeHandler;
@@ -67,11 +72,14 @@ public abstract class VideoPlayer implements VideoPlayerInstanceApi {
   // https://github.com/flutter/packages/pull/10193
   @SuppressWarnings("this-escape")
   public VideoPlayer(
+      @NonNull Context context,
       @NonNull VideoPlayerCallbacks events,
-      @NonNull MediaItem mediaItem,
+      @NonNull VideoAsset videoAsset,
       @NonNull VideoPlayerOptions options,
       @Nullable SurfaceProducer surfaceProducer,
       @NonNull ExoPlayerProvider exoPlayerProvider) {
+    this.context = context;
+    this.videoAsset = videoAsset;
     this.videoPlayerEvents = events;
     this.surfaceProducer = surfaceProducer;
     exoPlayer = exoPlayerProvider.get();
@@ -81,7 +89,7 @@ public abstract class VideoPlayer implements VideoPlayerInstanceApi {
       trackSelector = (DefaultTrackSelector) exoPlayer.getTrackSelector();
     }
 
-    exoPlayer.setMediaItem(mediaItem);
+    exoPlayer.setMediaItem(videoAsset.getMediaItem());
     exoPlayer.prepare();
     exoPlayerEventListener = createExoPlayerEventListener(exoPlayer, surfaceProducer);
     exoPlayer.addListener(exoPlayerEventListener);
@@ -447,6 +455,32 @@ public abstract class VideoPlayer implements VideoPlayerInstanceApi {
     // Apply the track selection override normally if dimensions haven't changed
     trackSelector.setParameters(
         trackSelector.buildUponParameters().setOverrideForType(override).build());
+  }
+
+  // TODO: Migrate to stable API, see https://github.com/flutter/flutter/issues/147039.
+  @UnstableApi
+  @Override
+  public void setExternalAudioTracks(@NonNull List<String> urls) {
+    MediaSource.Factory factory = videoAsset.getMediaSourceFactory(context);
+    List<MediaSource> sources = new ArrayList<>();
+
+    // Create main video source
+    sources.add(factory.createMediaSource(videoAsset.getMediaItem()));
+
+    // Create external audio sources
+    for (String url : urls) {
+      sources.add(factory.createMediaSource(MediaItem.fromUri(url)));
+    }
+
+    // Capture current player state
+    boolean playWhenReady = exoPlayer.getPlayWhenReady();
+    long currentPosition = exoPlayer.getCurrentPosition();
+
+    // Merge sources and set to player
+    MediaSource mergedSource = new MergingMediaSource(sources.toArray(new MediaSource[0]));
+    exoPlayer.setMediaSource(mergedSource);
+    exoPlayer.seekTo(currentPosition);
+    exoPlayer.setPlayWhenReady(playWhenReady);
   }
 
   public void dispose() {
