@@ -966,6 +966,17 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     await _videoPlayerPlatform.selectAudioTrack(_playerId, trackId);
   }
 
+  /// Sets external audio tracks for the video.
+  ///
+  /// The [urls] should be a list of external audio URLs to be merged with the video.
+  /// Throws an error if the video player is disposed or not initialized.
+  Future<void> setExternalAudioTracks(List<String> urls) async {
+    if (_isDisposedOrNotInitialized) {
+      throw StateError('VideoPlayerController is disposed or not initialized');
+    }
+    await _videoPlayerPlatform.setExternalAudioTracks(_playerId, urls);
+  }
+
   /// Returns whether audio track selection is supported on this platform.
   ///
   /// This method allows developers to query at runtime whether the current

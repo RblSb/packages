@@ -139,6 +139,13 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
     throw UnimplementedError('selectAudioTrack() has not been implemented.');
   }
 
+  /// Sets external audio tracks for the video.
+  Future<void> setExternalAudioTracks(int playerId, List<String> urls) {
+    throw UnimplementedError(
+      'setExternalAudioTracks() has not been implemented.',
+    );
+  }
+
   /// Returns whether audio track selection is supported on this platform.
   ///
   /// This method allows developers to query at runtime whether the current

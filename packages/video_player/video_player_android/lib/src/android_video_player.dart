@@ -261,6 +261,11 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
   }
 
   @override
+  Future<void> setExternalAudioTracks(int playerId, List<String> urls) {
+    return _playerWith(id: playerId).setExternalAudioTracks(urls);
+  }
+
+  @override
   bool isAudioTrackSupportAvailable() {
     // Android with ExoPlayer supports audio track selection
     return true;
@@ -382,6 +387,10 @@ class _PlayerInstance {
     } finally {
       _audioTrackSelectionCompleter = null;
     }
+  }
+
+  Future<void> setExternalAudioTracks(List<String> urls) {
+    return _api.setExternalAudioTracks(urls);
   }
 
   Future<void> dispose() async {
